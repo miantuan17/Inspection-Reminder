@@ -2,7 +2,7 @@ name: Workday Reminder
 
 on:
   schedule:
-    - cron: '30 09 * * *' # 这是北京时间 17:30 (09:30 UTC)
+  - cron: '45 09 * * *' # 这是北京时间 17:45 (09:45 UTC)
   workflow_dispatch:      # 这行很重要，它能让你手动点击运行，方便现在就测试
 
 jobs:
