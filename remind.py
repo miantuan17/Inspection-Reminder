@@ -1,10 +1,11 @@
+import os
 import requests
-import json
 import datetime
 
-# 配置信息
-WECHAT_WEBHOOK_URL = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=99d7822b-fad6-40a3-8feb-f6a6c5c435ba"
-FEISHU_DOC_URL = "https://fintopia.feishu.cn/share/base/form/shrcnSmWsCro06gvdnZP7bZ6Nhf"
+# 从 GitHub Secrets 中读取敏感信息
+# 这样即使代码公开，别人也看不到你的 Webhook 地址和文档链接
+WEBHOOK_URL = os.getenv('WECHAT_WEBHOOK_URL')
+FEISHU_DOC_URL = os.getenv('FEISHU_DOC_URL')
 
 def is_workday():
     """判断今天是否为法定工作日"""
