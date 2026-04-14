@@ -31,9 +31,10 @@ def send_wechat_remind():
 
     headers = {"Content-Type": "application/json"}
     payload = {
-        "msgtype": "markdown",
-        "markdown": {
-            "content": f"### 📝 填写飞书文档提醒\n各位同学，快下班了，请记得填写今日的文档。\n\n> [点击此处打开飞书文档]({FEISHU_DOC_URL})\n\n <@all>"
+        "msgtype": "text",
+        "text": {
+            "content": "📝 每日巡检提醒\n各位同学，快下班了，记得提交今天的巡检记录哦。Don't forget to submit the inspection record.\n链接：" + FEISHU_DOC_URL,
+            "mentioned_list": ["@all"]
         }
     }
     
