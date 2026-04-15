@@ -5,7 +5,7 @@ import json
 
 # 从环境变量读取
 WEBHOOK_URL = os.getenv('WECHAT_WEBHOOK_URL')
-FORM_URL = os.getenv('FEISHU_DOC_URL') 
+FORM_URL = os.getenv('FEISHU_DOC_URL')
 
 def is_workday():
     """检查今天是否为工作日"""
@@ -14,7 +14,7 @@ def is_workday():
         response = requests.get(f"https://timor.tech/api/holiday/info/{today}", timeout=10)
         data = response.json()
         day_type = data.get('type', {}).get('type')
-        return day_type not in [1, 2]
+        return day_type == 0  # 0=工作日
     except Exception as e:
         print(f"检查节假日失败: {e}")
         return True
@@ -29,30 +29,30 @@ def send_wechat_remind():
         return
 
     headers = {"Content-Type": "application/json"}
-    
-    # 构造消息内容
-    # 核心改动：把 <@all> 放在最后，并且保证它前面有两个换行，确保它不在引用块（>）内
-    content = (
-        "各位同学，快下班了，记得提交今天的巡检记录哦。\n"
-        "Don't forget to submit the inspection record.\n\n"
-        f"> [🔥 点击此处直接提交巡检记录]({FORM_URL.strip()})\n\n"
-        "\n"
-        "<@all>"
-    )
+
+    # 关键：@all 必须单独一行，不能放在 > 引用块里
+    content = f"""各位同学，快下班了，记得提交今天的巡检记录哦。
+Don't forget to submit the inspection record.
+
+[🔥 点击此处直接提交巡检记录]({FORM_URL.strip()})
+
+<@all>"""
 
     payload = {
         "msgtype": "markdown",
         "markdown": {
-            "content": content
+            "content": content,
+            "mentioned_list": ["@all"]  # 强制艾特所有人
         }
     }
 
     try:
-        response = requests.post(WEBHOOK_URL, headers=headers, data=json.dumps(payload))
-        if response.status_code == 200:
-            print("消息发送成功！")
+        response = requests.post(WEBHOOK_URL, headers=headers, data=json.dumps(payload, ensure_ascii=False))
+        result = response.json()
+        if result.get("errcode") == 0:
+            print("消息发送成功！@all 已生效")
         else:
-            print(f"发送失败: {response.status_code}, {response.text}")
+            print(f"发送失败: {result}")
     except Exception as e:
         print(f"请求异常: {e}")
 
