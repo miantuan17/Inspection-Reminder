@@ -19,7 +19,7 @@ jobs:
         # 升级到支持 Node.js 24 的最新版本
         uses: actions/setup-python@v6
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Install dependencies
         run: pip install requests
