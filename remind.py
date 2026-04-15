@@ -14,7 +14,7 @@ def is_workday():
         day_type = data.get('type', {}).get('type')
         return day_type == 0
     except:
-        return True  # 接口异常照样发
+        return True
 
 def send_wechat_remind():
     if not is_workday():
