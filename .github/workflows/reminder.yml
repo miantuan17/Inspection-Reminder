@@ -2,8 +2,7 @@ name: Workday Reminder
 
 on:
   schedule:
-    # 北京时间 13:45 = UTC 05:45
-    - cron: '45 05 * * *'
+    - cron: '00 06 * * *'
   workflow_dispatch:  # 保留手动触发
 
 jobs:
