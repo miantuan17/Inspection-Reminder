@@ -1,7 +1,7 @@
 name: Workday Reminder
 on:
   schedule:
-    - cron: '55 06 * * *'  
+    - cron: '00 07 * * *'   # 👉 北京时间 15:00 精准对应
   workflow_dispatch:
 
 jobs:
@@ -12,8 +12,12 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      - run: pip install requests
-      - run: python remind.py
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run script
         env:
-          WECHAT_WEBHOOK_URL: ${{ secrets.WECHAT_WEBHOOK_URL }}
-          FEISHU_DOC_URL: ${{ secrets.FEISHU_DOC_URL }}
+          WECHAT_URL: ${{ secrets.WECHAT_URL }}
+          FEISHU_URL: ${{ secrets.FEISHU_URL }}
+        run: python3 remind.py
