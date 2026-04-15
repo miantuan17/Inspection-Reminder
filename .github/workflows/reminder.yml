@@ -1,15 +1,19 @@
 name: Workday Reminder
+
 on:
   schedule:
-    - cron: '45 07 * * *'   # 👉 北京时间 15:45 精准对应
-  workflow_dispatch:
+    - cron: '00 09 * * *'  # 对应北京时间 17:00 (17:00 - 8 = 09:00)
+  workflow_dispatch:      # 允许手动点击按钮触发测试
 
 jobs:
   run_script:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -18,6 +22,7 @@ jobs:
 
       - name: Run script
         env:
+          # 这里必须与你 image3.png 里的名字完全一致
           WECHAT_WEBHOOK_URL: ${{ secrets.WECHAT_WEBHOOK_URL }}
           FEISHU_DOC_URL: ${{ secrets.FEISHU_DOC_URL }}
         run: python3 remind.py
