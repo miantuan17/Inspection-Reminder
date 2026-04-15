@@ -1,7 +1,7 @@
 name: Workday Reminder
 on:
   schedule:
-    - cron: '00 07 * * *'   # 👉 北京时间 15:00 精准对应
+    - cron: '30 07 * * *'   # 👉 北京时间 15:30 精准对应
   workflow_dispatch:
 
 jobs:
