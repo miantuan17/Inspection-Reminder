@@ -2,8 +2,8 @@ name: Workday Reminder
 
 on:
   schedule:
-    # 北京时间 13:35 (UTC 05:35)
-    - cron: '35 05 * * *'
+    # 北京时间 14:30 (UTC 06:30)
+    - cron: '30 06 * * *'
   workflow_dispatch:
 
 jobs:
