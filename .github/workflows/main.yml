@@ -2,7 +2,8 @@ name: Workday Reminder
 
 on:
   schedule:
-    - cron: '48 10 * * *'
+    - cron: '00 03 * * *'
+    - cron: '30 09 * * *'
   workflow_dispatch:
 
 jobs:
