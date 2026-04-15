@@ -3,22 +3,19 @@ import requests
 import datetime
 import json
 
-# 直接引用你 Secrets 里的变量名
+# ========== 完全匹配你 GitHub 里的密钥名 ==========
 WEBHOOK_URL = os.getenv('WECHAT_WEBHOOK_URL')
 FORM_URL = os.getenv('FEISHU_DOC_URL')
 
 def is_workday():
-    """终极优化节假日逻辑，彻底解决 image_ec1ae7 中的解析报错问题"""
     try:
         today = datetime.datetime.now().strftime('%Y-%m-%d')
-        # 增加超时控制
         resp = requests.get(f"https://timor.tech/api/holiday/info/{today}", timeout=5)
         
-        # 只有状态码为 200 才尝试解析 JSON
         if resp.status_code == 200:
             try:
                 data = resp.json()
-                # type: 0工作日, 3调休 (需要发送) | 1周末, 2节假日 (不发送)
+                # type: 0=工作日 3=调休工作日 → 发送；1=周末 2=节假日 → 不发送
                 day_type = data.get('type', {}).get('type')
                 return day_type not in [1, 2]
             except json.JSONDecodeError:
@@ -35,10 +32,9 @@ def send_remind():
         return
 
     if not WEBHOOK_URL:
-        print("未检测到 Webhook URL")
+        print("未检测到 Webhook URL，发送终止。")
         return
 
-    # 按照你的要求：保留原内容，使用 text 模式确保艾特 100% 成功
     content = (
         "各位同学，快下班了，记得提交今天的巡检记录哦。\n"
         "Don't forget to submit the inspection record.\n\n"
@@ -49,12 +45,11 @@ def send_remind():
         "msgtype": "text",
         "text": {
             "content": content,
-            "mentioned_list": ["@all"] # 强提醒所有人
+            "mentioned_list": ["@all"]
         }
     }
 
     try:
-        # 使用 json= 参数会自动设置 content-type 为 application/json
         r = requests.post(WEBHOOK_URL, json=payload, timeout=10)
         print(f"发送结果: {r.status_code}, {r.text}")
     except Exception as e:
