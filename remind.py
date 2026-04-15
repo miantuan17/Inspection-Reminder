@@ -3,44 +3,41 @@ import requests
 import datetime
 import json
 
-# 从环境变量读取映射
+# 从环境变量读取
 WEBHOOK_URL = os.getenv('WECHAT_WEBHOOK_URL')
-# 对应你存入 Secrets 的表单链接
 FORM_URL = os.getenv('FEISHU_DOC_URL') 
 
 def is_workday():
     """检查今天是否为工作日"""
     try:
         today = datetime.datetime.now().strftime('%Y-%m-%d')
-        # 使用提摩节假日 API
         response = requests.get(f"https://timor.tech/api/holiday/info/{today}", timeout=10)
         data = response.json()
         day_type = data.get('type', {}).get('type')
-        return day_type not in [1, 2] # 0工作日, 3调休
+        return day_type not in [1, 2]
     except Exception as e:
-        print(f"检查节假日失败: {e}，默认执行发送。")
+        print(f"检查节假日失败: {e}")
         return True
 
 def send_wechat_remind():
     if not is_workday():
-        print("今天非工作日，跳过提醒。")
+        print("今天非工作日，不发送提醒。")
         return
 
     if not WEBHOOK_URL:
-        print("错误: 未找到 WEBHOOK 环境变量，请检查 Secrets 配置。")
+        print("错误: 未找到 WEBHOOK 环境变量")
         return
 
     headers = {"Content-Type": "application/json"}
     
     # 构造消息内容
-    # 1. 链接单独起行
-    # 2. <@all> 前后加换行，确保在企业微信中强力生效
+    # 1. <@all> 放在最前面，确保提醒生效
+    # 2. 链接使用 [🔥 点击此处直接提交巡检记录](链接) 的格式
     content = (
-        f"各位同学，快下班了，记得提交今天的巡检记录哦。\n"
-        f"Don't forget to submit the inspection record.\n\n"
-        f"🔗 填写链接：\n"
-        f"{FORM_URL}\n\n"
-        f"<@all>"
+        "<@all>\n"
+        "各位同学，快下班了，记得提交今天的巡检记录哦。\n"
+        "Don't forget to submit the inspection record.\n\n"
+        f"> [🔥 点击此处直接提交巡检记录]({FORM_URL.strip()})"
     )
 
     payload = {
