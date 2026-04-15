@@ -2,30 +2,29 @@ name: Workday Reminder
 
 on:
   schedule:
-    # 第一次：北京时间 13:35 (UTC 35:05)
-    - cron: '35 05 * * *'
-    # 第二次：北京时间 17:30 (UTC 09:30)
-    - cron: '30 09 * * *'
-  workflow_dispatch: # 保留手动触发按钮
+    # 北京时间 13:45 = UTC 05:45
+    - cron: '45 05 * * *'
+  workflow_dispatch:  # 保留手动触发
 
 jobs:
   run_script:
     runs-on: ubuntu-latest
+    # 强制只在默认分支运行（防止非main分支失效）
+    if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run reminder script
+      - name: Run reminder
         env:
-          # 务必确认 GitHub Secrets 里有这两个名字
           WECHAT_WEBHOOK_URL: ${{ secrets.WECHAT_WEBHOOK_URL }}
           FEISHU_DOC_URL: ${{ secrets.FEISHU_DOC_URL }}
         run: python remind.py
