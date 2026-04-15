@@ -31,13 +31,13 @@ def send_wechat_remind():
     headers = {"Content-Type": "application/json"}
     
     # 构造消息内容
-    # 1. <@all> 放在最前面，确保提醒生效
-    # 2. 链接使用 [🔥 点击此处直接提交巡检记录](链接) 的格式
+    # 核心改动：把 <@all> 放在最后，并且保证它前面有两个换行，确保它不在引用块（>）内
     content = (
-        "<@all>\n"
         "各位同学，快下班了，记得提交今天的巡检记录哦。\n"
         "Don't forget to submit the inspection record.\n\n"
-        f"> [🔥 点击此处直接提交巡检记录]({FORM_URL.strip()})"
+        f"> [🔥 点击此处直接提交巡检记录]({FORM_URL.strip()})\n\n"
+        "\n"
+        "<@all>"
     )
 
     payload = {
