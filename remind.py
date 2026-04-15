@@ -4,7 +4,7 @@ import datetime
 
 # 从 GitHub Secrets 中读取敏感信息
 # 这样即使代码公开，别人也看不到你的 Webhook 地址和文档链接
-WEBHOOK_URL = os.getenv('WECHAT_WEBHOOK_URL')
+WECHAT_WEBHOOK_URL = os.getenv('WECHAT_WEBHOOK_URL')
 FEISHU_DOC_URL = os.getenv('FEISHU_DOC_URL')
 
 def is_workday():
