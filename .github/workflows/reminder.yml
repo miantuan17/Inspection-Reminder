@@ -2,27 +2,29 @@ name: Workday Reminder
 
 on:
   schedule:
-    - cron: '00 06 * * *'
-  workflow_dispatch:  # 保留手动触发
+    # 北京时间 13:35 (UTC 05:35)
+    - cron: '35 05 * * *'
+  workflow_dispatch:
 
 jobs:
   run_script:
     runs-on: ubuntu-latest
-    # 强制只在默认分支运行（防止非main分支失效）
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        # 升级到支持 Node.js 24 的最新版本
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        # 升级到支持 Node.js 24 的最新版本
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.9'
 
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run reminder
+      - name: Run reminder script
         env:
           WECHAT_WEBHOOK_URL: ${{ secrets.WECHAT_WEBHOOK_URL }}
           FEISHU_DOC_URL: ${{ secrets.FEISHU_DOC_URL }}
