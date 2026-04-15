@@ -1,28 +1,20 @@
 name: Workday Reminder
-
 on:
   schedule:
-    - cron: '45 7 * * *'   # UTC 时间（= 北京15:45）
+    - cron: '45 07 * * *'   # 👉 北京时间 15:45 精准对应
   workflow_dispatch:
 
 jobs:
   run_script:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v5
-
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
       - name: Install dependencies
         run: pip install requests
-
-      - name: Debug env
-        run: |
-          echo "WECHAT_WEBHOOK_URL=$WECHAT_WEBHOOK_URL"
-          echo "FEISHU_DOC_URL=$FEISHU_DOC_URL"
 
       - name: Run script
         env:
