@@ -1,49 +1,60 @@
 import os
 import requests
+import datetime
 import json
 
-# 1. 从 GitHub Secrets 读取变量
+# ========== 完全匹配你 GitHub 里的密钥名 ==========
 WEBHOOK_URL = os.getenv('WECHAT_WEBHOOK_URL')
 FORM_URL = os.getenv('FEISHU_DOC_URL')
 
+def is_workday():
+    try:
+        today = datetime.datetime.now().strftime('%Y-%m-%d')
+        resp = requests.get(f"https://timor.tech/api/holiday/info/{today}", timeout=5)
+        
+        if resp.status_code == 200:
+            try:
+                data = resp.json()
+                # type: 0=工作日 3=调休工作日 → 发送；1=周末 2=节假日 → 不发送
+                day_type = data.get('type', {}).get('type')
+                return day_type not in [1, 2]
+            except json.JSONDecodeError:
+                print("API返回格式异常，默认视为工作日以防漏发。")
+                return True
+        return True
+    except Exception as e:
+        print(f"检查节假日失败 ({e})，启用保底逻辑：视为工作日。")
+        return True
+
 def send_remind():
-    # 检查 Webhook 地址是否存在
-    if not WEBHOOK_URL:
-        print("错误: 未找到 WECHAT_WEBHOOK_URL，请检查 GitHub Secrets 配置。")
+    if not is_workday():
+        print("今日休息，不发送消息。")
         return
 
-    # 2. 构造通知内容 (保持原样)
-    clean_url = FORM_URL.strip() if FORM_URL else "未配置链接"
-    msg_content = (
+    if not WEBHOOK_URL:
+        print("未检测到 Webhook URL，发送终止。")
+        return
+
+    content = (
         "各位同学，快下班了，记得提交今天的巡检记录哦。\n"
         "Don't forget to submit the inspection record.\n\n"
-        f"填写链接：{clean_url}"
+        f"填写链接：{FORM_URL.strip() if FORM_URL else ''}"
     )
 
-    # 3. 构造纯文本 Payload，确保 @所有人 100% 成功
     payload = {
         "msgtype": "text",
         "text": {
-            "content": msg_content,
-            "mentioned_list": ["@all"]  # 强提醒艾特
+            "content": content,
+            "mentioned_list": ["@all"]
         }
     }
 
-    # 4. 执行发送
     try:
-        headers = {"Content-Type": "application/json"}
-        response = requests.post(
-            WEBHOOK_URL, 
-            json=payload, 
-            headers=headers, 
-            timeout=10
-        )
-        if response.status_code == 200:
-            print("消息发送指令已成功发出！")
-        else:
-            print(f"发送失败，状态码: {response.status_code}, 详情: {response.text}")
+        r = requests.post(WEBHOOK_URL, json=payload, timeout=10)
+        print(f"发送结果: {r.status_code}, {r.text}")
     except Exception as e:
-        print(f"网络异常: {e}")
+        print(f"发送失败: {e}")
 
 if __name__ == "__main__":
     send_remind()
+
