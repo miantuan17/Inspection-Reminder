@@ -1,7 +1,7 @@
 name: Daily Reminder
 on:
   schedule:
-    - cron: '00 08 * * *'  # 北京时间 16:00
+    - cron: '03 08 * * *'  # 北京时间 16:03
   workflow_dispatch:
 
 jobs:
